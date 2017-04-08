@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+########################################################################################################################
+##                                      Vagrant Swap BASH Script                                                      ##
+########################################################################################################################
+
 # Swap size in MB
 swapsize=512
 
@@ -17,8 +21,3 @@ if [ $? -ne 0 ]; then
 else
   echo 'swapfile found. No changes made.'
 fi
-
-# Output results to terminal
-df -h
-cat /proc/swaps
-cat /proc/meminfo | grep Swap

@@ -12,13 +12,16 @@ VAGRANTFILE_API_VERSION = "2"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.box = "ubuntu/xenial64"
-  config.vm.hostname = "#{$ProjectName}"
-  config.vm.network "forwarded_port", guest: 81, host: 8100
-  config.vm.network "forwarded_port", guest: 80, host: 8000
-  config.vm.network :forwarded_port, guest: 3306, host: 33060
-  config.vm.synced_folder "cms", "/var/www/typo3",
-    owner: "ubuntu",
-    group: "www-data"
+
+  config.vm.define "typo3" do |typo3|
+    typo3.vm.hostname = "#{$ProjectName}"
+    typo3.vm.network "forwarded_port", guest: 81, host: 8100,  host_ip: "127.0.0.1", id: 'phpMyAdmin'
+    typo3.vm.network "forwarded_port", guest: 80, host: 8000,  host_ip: "127.0.0.1", id: 'apache'
+    typo3.vm.network :forwarded_port, guest: 3306, host: 33060,  host_ip: "127.0.0.1", id: 'db'
+    typo3.vm.synced_folder "cms", "/var/www/typo3",
+      owner: "ubuntu",
+      group: "www-data"
+  end
 
   config.vm.provider "virtualbox" do |v|
     v.name = "#{$ProjectName}"
@@ -28,9 +31,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   config.vm.provision :shell,
+  inline: "echo -e '\n--- TYPO3 Environment installing now... Mkay?! ---\n'"
+
+  config.vm.provision :shell,
     path: "https://raw.githubusercontent.com/dopa0002/vagrant/master/typo3/scripts/ubuntu-swap.sh"
   config.vm.provision :shell,
     path: "https://raw.githubusercontent.com/dopa0002/vagrant/master/typo3/scripts/ubuntu-bootstrap.sh"
+
+  config.vm.provision :shell,
+    inline:   "echo -e '\n--- Development Environment ready  ---\n'"
+
 
 
 
