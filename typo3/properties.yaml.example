@@ -1,0 +1,18 @@
+name: TYPO3-Environment
+database:
+  name: typo3
+  user: dp
+  password: Test123
+phpMyAdmin:
+  username:
+  password: Test123
+github:
+  path: https://raw.githubusercontent.com/dopa0002/vagrant/master/typo3/
+apache:
+  ServerName: typo3.localhost
+  Default_Document_Root: /var/www/typo3
+server:
+  identifier: typo3.dev
+  ports:
+    - { from: 8000, to: 80, id: apache}
+    - { from: 33060, to: 3306, id: db}

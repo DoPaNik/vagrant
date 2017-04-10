@@ -1,47 +1,79 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
-$ProjectName = 'TYPO3-Environment'
 
 
 ENV["LC_ALL"] = "de_DE.UTF-8"
 VAGRANTFILE_API_VERSION = "2"
+
+# Require YAML module
+require 'yaml'
+
+# Read YAML file with box details
+properties = YAML.load_file('properties.yaml')
+
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-
-  config.vm.box = "ubuntu/xenial64"
-
-  config.vm.define "typo3" do |typo3|
-    typo3.vm.hostname = "#{$ProjectName}"
-    typo3.vm.network "forwarded_port", guest: 81, host: 8100,  host_ip: "127.0.0.1", id: 'phpMyAdmin'
-    typo3.vm.network "forwarded_port", guest: 80, host: 8000,  host_ip: "127.0.0.1", id: 'apache'
-    typo3.vm.network :forwarded_port, guest: 3306, host: 33060,  host_ip: "127.0.0.1", id: 'db'
-    typo3.vm.synced_folder "cms", "/var/www/typo3",
+  # Fix for the stdin: is not a tty issue #1673 -> https://github.com/mitchellh/vagrant/issues/1673
+  config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
+  if properties.has_key?('server')
+    server = properties['server']
+    config.vm.define "#{server['identifier']}" do |typo3|
+      typo3.vm.hostname = server['identifier']
+      typo3.vm.box = "ubuntu/trusty64"
+      if server.has_key?('ports')
+        server['ports'].each do |port|
+          typo3.vm.network 'forwarded_port', guest: port['to'], host: port['from'], host_ip: "127.0.0.1", id: port['id']
+        end
+      end
+      typo3.vm.synced_folder "cms", "/var/www/typo3",
       owner: "ubuntu",
       group: "www-data"
+      typo3.vm.provider "virtualbox" do |v|
+      v.name = properties["name"]
+      v.customize ["setextradata", :id, "VBoxInternal2/SharedFoldersEnableSymlinksCreate/v-root", "1"]
+      v.memory = 2048
+      v.cpus = 2
+    end
+      config.vm.provision :shell,
+        inline: "echo -e '\n--- TYPO3 Environment installing now... Mkay?! ---\n'"
+      config.vm.provision :shell,
+        path: "scripts/ubuntu-locations.sh"
+      config.vm.provision :shell,
+        path: "scripts/ubuntu-swap.sh"
+      config.vm.provision :shell,
+        path: "scripts/ubuntu-bootstrap.sh"
+      config.vm.provision :shell,
+        path: "scripts/ubuntu-ohmyzsh.sh"
+      config.vm.provision "shell" do |s|
+        if properties.has_key?('apache')
+          apache = properties['apache']
+          s.path = "scripts/ubuntu-apache2.sh"
+          s.args = [apache["ServerName"], apache["Default_Document_Root"] ]
+        end
+      end
+      config.vm.provision "shell" do |s|
+        if properties.has_key?('database')
+          database = properties['database']
+          s.path = "scripts/ubuntu-mysql.sh"
+          s.args = [database['name'], database['user'], database['password']]
+        end
+      end
+      config.vm.provision "shell" do |s|
+        if properties.has_key?('apache') && properties.has_key?('phpMyAdmin')
+          apache = properties['apache']
+          phpMyAdmin = properties['phpMyAdmin']
+          s.path = "scripts/ubuntu-phpMyAdmin.sh"
+          #  DEFAULT_DOCUMENT_ROOT, DBPASSWD
+          s.args = [apache['Default_Document_Root'], phpMyAdmin['password']]
+        end
+      end
+      config.vm.provision :shell,
+        path: "scripts/ubuntu-composer.sh"
+      config.vm.provision :shell,
+        inline:   "echo -e '\n--- Development Environment ready  ---\n'"
+    end
   end
-
-  config.vm.provider "virtualbox" do |v|
-    v.name = "#{$ProjectName}"
-    v.customize ["setextradata", :id, "VBoxInternal2/SharedFoldersEnableSymlinksCreate/v-root", "1"]
-    v.memory = 2048
-    v.cpus = 2
-  end
-
-  config.vm.provision :shell,
-  inline: "echo -e '\n--- TYPO3 Environment installing now... Mkay?! ---\n'"
-
-  config.vm.provision :shell,
-    path: "https://raw.githubusercontent.com/dopa0002/vagrant/master/typo3/scripts/ubuntu-swap.sh"
-  config.vm.provision :shell,
-    path: "https://raw.githubusercontent.com/dopa0002/vagrant/master/typo3/scripts/ubuntu-bootstrap.sh"
-
-  config.vm.provision :shell,
-    inline:   "echo -e '\n--- Development Environment ready  ---\n'"
-
-
-
-
 end
