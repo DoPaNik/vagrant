@@ -13,6 +13,7 @@ cat <<"EOF"
 EOF
 
 echo -e "\n--- Preconfigure Environment ---\n"
+mkdir -p /vagrant/cms
 mkdir -p /vagrant/logs
 echo "Start Initialisation of VM" > /vagrant/logs/vm_build.log
 sudo rm --recursive --dir --force /vagrant/cms/**
