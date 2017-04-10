@@ -29,7 +29,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         end
       end
       typo3.vm.synced_folder "cms", "/var/www/typo3",
-      owner: "ubuntu",
+      owner: "vagrant",
       group: "www-data"
       typo3.vm.provider "virtualbox" do |v|
       v.name = properties["name"]
@@ -40,11 +40,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       config.vm.provision :shell,
         inline: "echo -e '\n--- TYPO3 Environment installing now... Mkay?! ---\n'"
       config.vm.provision :shell,
+        path: "scripts/ubuntu-bootstrap.sh"
+      config.vm.provision :shell,
         path: "scripts/ubuntu-locations.sh"
       config.vm.provision :shell,
         path: "scripts/ubuntu-swap.sh"
-      config.vm.provision :shell,
-        path: "scripts/ubuntu-bootstrap.sh"
       config.vm.provision :shell,
         path: "scripts/ubuntu-ohmyzsh.sh"
       config.vm.provision "shell" do |s|
@@ -73,7 +73,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       config.vm.provision :shell,
         path: "scripts/ubuntu-composer.sh"
       config.vm.provision :shell,
-        inline:   "echo -e '\n--- Development Environment ready  ---\n'"
+        inline:   "echo -e '\n--- Development Environment ready  ---\n \t Lets start at ->\t http://localhost:8000'"
     end
   end
 end

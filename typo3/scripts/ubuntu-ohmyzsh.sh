@@ -8,12 +8,12 @@
 
 
 echo -e "\n--- Install Zsh and Git packages ---\n"
-apt-get -y install zsh git-core > /dev/null 2>&1
+apt-get -y install zsh git-core >> /vagrant/logs/vm_build.log 2>&1
 
 echo -e "\n--- Download and run the Oh-my-Zsh-Installscript ---\n"
 mkdir zsh
 wget -q https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O zsh/install.sh
-sudo -u vagrant -H sh -c "bash zsh/install.sh" > /dev/null 2>&1
+sudo -u vagrant -H sh -c "bash zsh/install.sh" >> /vagrant/logs/vm_build.log 2>&1
 rm -rf zsh
 
 echo -e "\n--- Set Zsh as default ---\n"
