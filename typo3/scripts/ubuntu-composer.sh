@@ -14,7 +14,6 @@ if [[ -s /vagrant/composer.lock ]] ;then
   rm -rf /vagrant/composer.lock
 fi
 
-
 if [[ -s /vagrant/composer.json ]] ;then
   cd /vagrant
   #TODO Integrate Configuration for Composer via yaml-File

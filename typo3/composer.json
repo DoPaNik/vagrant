@@ -6,7 +6,8 @@
     }
   ],
   "require": {
-    "typo3/cms": "7.6.6"
+    "typo3/cms": "7.6.6",
+    "typo3-ter/extension-builder": "^7.6.0"
   },
   "config": {
     "vendor-dir": "cms/vendor",
@@ -17,10 +18,5 @@
       "cms-package-dir": "{$vendor-dir}/typo3/cms",
       "web-dir": "cms"
     }
-  },
-  "scripts" : {
-    "post-install-cmd" : [
-      "touch /vagrant/cms/FIRST_INSTALL"
-    ]
   }
 }

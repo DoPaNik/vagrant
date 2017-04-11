@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
-SERVER_NAME=$1
-DEFAULT_DOCUMENT_ROOT=$2
+SERVER_NAME=${1:-'default'}
+DEFAULT_DOCUMENT_ROOT=${2:-'/var/www/html'}
 
 ########################################################################################################################
 ##                                      Vagrant Apache2 BASH Script                                              ##

@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
-DBNAME=$1
-DBUSER=$2
-DBPASSWD=$3
+DBNAME=${1:-'db_default'}
+DBUSER=${2:-'root'}
+DBPASSWD=${3:-'root'}
 
 ########################################################################################################################
 ##                                      Vagrant MySQL BASH Script                                              ##

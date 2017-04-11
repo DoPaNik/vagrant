@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
-DEFAULT_DOCUMENT_ROOT=$1
-DBPASSWD=$2
+DEFAULT_DOCUMENT_ROOT=${1:-'/var/www/html'}
+DBPASSWD=${2:-'root'}
 
 ########################################################################################################################
 ##                                      Vagrant phpMyAdmin BASH Script                                              ##

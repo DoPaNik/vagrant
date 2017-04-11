@@ -39,39 +39,26 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
       config.vm.provision :shell,
         inline: "echo -e '\n--- TYPO3 Environment installing now... Mkay?! ---\n'"
-      config.vm.provision :shell,
-        path: "scripts/ubuntu-bootstrap.sh"
-      config.vm.provision :shell,
-        path: "scripts/ubuntu-locations.sh"
-      config.vm.provision :shell,
-        path: "scripts/ubuntu-swap.sh"
-      config.vm.provision :shell,
-        path: "scripts/ubuntu-ohmyzsh.sh"
-      config.vm.provision "shell" do |s|
-        if properties.has_key?('apache')
-          apache = properties['apache']
-          s.path = "scripts/ubuntu-apache2.sh"
-          s.args = [apache["ServerName"], apache["Default_Document_Root"] ]
+      if server.has_key?('provision')
+        server['provision'].each do |provision|
+          config.vm.provision "shell" do |s|
+            s.path = provision['path_to_script']
+            if provision.has_key?('args')
+              result = []
+              provision['args'].each do |arg|
+                array = arg.split('.')
+                if array.length == 2
+                  object = properties[array[0]]
+                  result.push(object[array[1]])
+                else
+                  print "Variable has too many levels"
+                end
+              end
+              s.args = result
+            end
+          end
         end
       end
-      config.vm.provision "shell" do |s|
-        if properties.has_key?('database')
-          database = properties['database']
-          s.path = "scripts/ubuntu-mysql.sh"
-          s.args = [database['name'], database['user'], database['password']]
-        end
-      end
-      config.vm.provision "shell" do |s|
-        if properties.has_key?('apache') && properties.has_key?('phpMyAdmin')
-          apache = properties['apache']
-          phpMyAdmin = properties['phpMyAdmin']
-          s.path = "scripts/ubuntu-phpMyAdmin.sh"
-          #  DEFAULT_DOCUMENT_ROOT, DBPASSWD
-          s.args = [apache['Default_Document_Root'], phpMyAdmin['password']]
-        end
-      end
-      config.vm.provision :shell,
-        path: "scripts/ubuntu-composer.sh"
       config.vm.provision :shell,
         inline:   "echo -e '\n--- Development Environment ready  ---\n \t Lets start at ->\t http://localhost:8000'"
     end
