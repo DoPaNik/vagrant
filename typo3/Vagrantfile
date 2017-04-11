@@ -29,7 +29,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         end
       end
       typo3.vm.synced_folder "cms", "/var/www/typo3",
-      owner: "vagrant",
+      owner: "www-data",
       group: "www-data"
       typo3.vm.provider "virtualbox" do |v|
       v.name = properties["name"]
